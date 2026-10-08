@@ -10,12 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const typeEl = document.querySelector(".text-animation span");
 
   if (typeEl) {
-    // disable CSS pseudo animation so JS takes over
     const noAnim = document.createElement("style");
     noAnim.textContent = `.text-animation span::before{content:none!important;animation:none!important;}`;
     document.head.appendChild(noAnim);
 
-    // real text node and cursor
+    // real text node ama cursor
     const textNode = document.createTextNode("");
     const cur = document.createElement("span");
     cur.textContent = "|";
@@ -41,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  // Hamburger 
+  // hamburger 
   const header  = document.querySelector("header");
   const navbar  = document.querySelector(".navbar");
 
@@ -76,13 +75,13 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
 
-  // Header glass on scroll 
+  // header glass pas scroll 
   window.addEventListener("scroll", () => {
     header.classList.toggle("scrolled", window.scrollY > 30);
   }, { passive: true });
 
 
-  // Smooth scroll
+  // smooth scroll
   document.querySelectorAll(".navbar a[href^='#']").forEach(a => {
     const href = a.getAttribute("href");
     if (href.length > 1) {
@@ -93,15 +92,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-
-  //Social icon hover lift
   document.querySelectorAll(".download-social a").forEach(a => {
     a.addEventListener("mouseenter", () => a.style.transform = "translateY(-4px)");
     a.addEventListener("mouseleave", () => a.style.transform = "");
   });
-
-
-  //Scroll-reveal elements 
+ 
   const revealCSS = document.createElement("style");
   revealCSS.textContent = `
     .reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease;}
@@ -124,8 +119,80 @@ document.addEventListener("DOMContentLoaded", () => {
     ro.observe(el);
   });
 
+const wrapper = document.getElementById('certWrapper');
+const track = document.getElementById('certTrack');
 
-  // Back-to-top button
+if (wrapper && track) {
+    wrapper.style.scrollBehavior = 'auto';
+    wrapper.style.overflowX = 'auto';
+
+    // ngedouble isi track buat efek infinite loop
+    track.innerHTML += track.innerHTML;
+
+    let isDragging = false;
+    let startX, scrollLeftStart;
+    const speed = 0.5; 
+
+    function autoScroll() {
+        if (!isDragging) {
+            wrapper.scrollLeft += speed;
+            
+            // Reset jika sudah setengah jalan
+            if (wrapper.scrollLeft >= (track.scrollWidth / 2)) {
+                wrapper.scrollLeft = 0;
+            }
+        }
+        requestAnimationFrame(autoScroll);
+    }
+
+    // load time agar gambar terender, baru start auto-scroll
+    setTimeout(() => {
+        autoScroll();
+    }, 450);
+
+    wrapper.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        wrapper.classList.add('active');
+        startX = e.pageX - wrapper.offsetLeft;
+        scrollLeftStart = wrapper.scrollLeft;
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+        isDragging = false;
+        wrapper.classList.remove('active');
+    });
+
+    wrapper.addEventListener('mouseup', () => {
+        isDragging = false;
+        wrapper.classList.remove('active');
+    });
+
+    wrapper.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.pageX - wrapper.offsetLeft;
+        const walk = (x - startX) * 2;
+        wrapper.scrollLeft = scrollLeftStart - walk;
+    });
+
+    wrapper.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        startX = e.touches[0].pageX - wrapper.offsetLeft;
+        scrollLeftStart = wrapper.scrollLeft;
+    }, { passive: true });
+
+    wrapper.addEventListener('touchend', () => {
+        isDragging = false;
+    });
+
+    wrapper.addEventListener('touchmove', (e) => {
+        isDragging = true;
+    }, { passive: true });
+} else {
+    console.error("Elemen #certWrapper atau #certTrack tidak ditemukan!");
+}
+
+  // back-to-top button
   const topBtn = document.createElement("button");
   topBtn.setAttribute("aria-label", "Back to top");
   topBtn.innerHTML = `<i class="ri-arrow-up-s-line"></i>`;
